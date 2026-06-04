@@ -35,7 +35,7 @@ button.tb.acc:hover{background:#ff5a2e;}
 .menu.on{display:block;}
 .menu button{display:block;width:100%;text-align:left;border:0;background:#fff;color:#22262c;font:inherit;font-size:13px;padding:9px 12px;cursor:pointer;}
 .menu button:hover{background:#f0f4f9;}
-.work{flex:1;overflow:auto;padding:26px 16px 130px;}
+.stage{flex:1;overflow:auto;padding:26px 16px 130px;}
 .doc{max-width:850px;margin:0 auto;background:#fff;box-shadow:0 4px 22px rgba(0,0,0,.45);border-radius:6px;overflow:hidden;min-height:300px;}
 .block{position:relative;}
 .block .ctl{position:absolute;top:4px;right:6px;display:none;gap:3px;z-index:5;}
@@ -83,7 +83,7 @@ button.tb.acc:hover{background:#ff5a2e;}
     </div>
     <div class="grp"><span class="lbl">Theme</span>
       <span class="seg" id="themeSeg">
-        <button data-th="ro" class="on">Retail&nbsp;Odyssey</button>
+        <button data-th="ro" class="on">Odyssey</button>
         <button data-th="tactag">TACTAG</button>
         <button data-th="plain">Plain</button>
         <button data-th="custom">Custom</button>
@@ -139,7 +139,7 @@ button.tb.acc:hover{background:#ff5a2e;}
   </div>
 </div>
 
-<div class="work"><div id="canvas" class="doc"></div></div>
+<div class="stage"><div id="canvas" class="doc"></div></div>
 
 <input type="file" id="fileTxt" accept=".txt,text/plain" style="display:none">
 <input type="file" id="fileHtml" accept=".html,.htm,text/html" style="display:none">
@@ -160,7 +160,7 @@ button.tb.acc:hover{background:#ff5a2e;}
   <p class="hint" style="margin:0 0 10px">Pick a built-in mark or upload your own. Embedded in every export (offline-safe). These marks are transparent, so they sit cleanly on any band color.</p>
   <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
     <button class="logopick" data-mark="pagesmith" title="PageSmith"><img data-logo-preview="pagesmith" alt="PageSmith"></button>
-    <button class="logopick" data-mark="ro" title="Retail Odyssey"><img data-logo-preview="ro" alt="Retail Odyssey"></button>
+    <button class="logopick" data-mark="ro" title="Odyssey"><img data-logo-preview="ro" alt="Odyssey"></button>
     <button class="logopick" data-mark="tactag" title="TACTAG"><img data-logo-preview="tactag" alt="TACTAG"></button>
   </div>
   <div class="acts" style="justify-content:flex-start;flex-wrap:wrap">
@@ -219,7 +219,7 @@ button.tb.acc:hover{background:#ff5a2e;}
     </ul>
     <p style="margin:0 0 4px;font-weight:700;color:#161616;">Good to know</p>
     <ul style="margin:0;padding-left:18px;">
-      <li><b>Run it locally</b> (download, double-click). Clipboard, file-save, and pop-ups may be blocked inside a preview sandbox but work once it&rsquo;s local.</li>
+      <li><b>Run it locally</b> (download, double-click). Clipboard, file-save, and pop-ups may be blocked inside a preview sandbox but function once it&rsquo;s local.</li>
       <li><b>PDF</b> prints from your browser &mdash; tick <b>Background graphics</b> so branded bands print.</li>
       <li><b>DOCX</b> is editable Word, not a pixel match: rings come in as images, everything else as editable content.</li>
     </ul>
@@ -20360,7 +20360,7 @@ document.querySelectorAll('[data-logo-preview]').forEach(img=>{const m=LOGOS[img
 /* ---------- theme variables ---------- */
 const VARMAP={bandBg:'--band-bg',bandFg:'--band-fg',bandSub:'--band-sub',bandBB:'--band-bb',bandBBP:'--band-bbp',accent:'--accent',hColor:'--h-color',calloutBg:'--callout-bg',calloutBd:'--callout-bd',statNum:'--stat-num',statLab:'--stat-lab',statTxt:'--stat-txt',theadBg:'--thead-bg',theadFg:'--thead-fg',font:'--font',h3tt:'--h3-tt'};
 const THEMES={
- ro:{name:'Retail Odyssey',vars:{bandBg:'#15243f',bandFg:'#ffffff',bandSub:'#a9c4e3',bandBB:'none',bandBBP:'0',accent:'#2f6fb0',hColor:'#15243f',calloutBg:'#eaf1f8',calloutBd:'#cdddee',statNum:'#15243f',statLab:'#2f6fb0',statTxt:'#36465f',theadBg:'#eaf1f8',theadFg:'#15243f',font:"'Calibri','Carlito','Segoe UI',system-ui,sans-serif",h3tt:'uppercase',ringNow:'#2f6fb0'}},
+ ro:{name:'Odyssey',vars:{bandBg:'#15243f',bandFg:'#ffffff',bandSub:'#a9c4e3',bandBB:'none',bandBBP:'0',accent:'#2f6fb0',hColor:'#15243f',calloutBg:'#eaf1f8',calloutBd:'#cdddee',statNum:'#15243f',statLab:'#2f6fb0',statTxt:'#36465f',theadBg:'#eaf1f8',theadFg:'#15243f',font:"'Calibri','Carlito','Segoe UI',system-ui,sans-serif",h3tt:'uppercase',ringNow:'#2f6fb0'}},
  tactag:{name:'TACTAG',vars:{bandBg:'#161616',bandFg:'#ffffff',bandSub:'#ee4a1c',bandBB:'none',bandBBP:'0',accent:'#ee4a1c',hColor:'#161616',calloutBg:'#fdf0ea',calloutBd:'#f3c3ad',statNum:'#161616',statLab:'#ee4a1c',statTxt:'#3a3a3a',theadBg:'#161616',theadFg:'#ffffff',font:"'Segoe UI',system-ui,sans-serif",h3tt:'uppercase',ringNow:'#ee4a1c'}},
  plain:{name:'Plain',vars:{bandBg:'#ffffff',bandFg:'#1a1a1a',bandSub:'#5f5e5a',bandBB:'3px solid #888888',bandBBP:'8px',accent:'#888888',hColor:'#222222',calloutBg:'#f4f4f2',calloutBd:'#e0e0da',statNum:'#222222',statLab:'#555555',statTxt:'#333333',theadBg:'#efefec',theadFg:'#222222',font:"Georgia,'Times New Roman',serif",h3tt:'none',ringNow:'#666666'}},
  custom:{name:'Custom',vars:null}
