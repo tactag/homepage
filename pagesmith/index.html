@@ -95,8 +95,8 @@ button.tb.acc:hover{background:#ff5a2e;}
     <div class="grp menu-wrap"><span class="lbl">Start</span>
       <button class="tb" id="btnTemplates">Templates ▾</button>
       <div class="menu" id="tplMenu">
-        <button data-tpl="passdown">District Passdown</button>
-        <button data-tpl="bulletin">Field Bulletin</button>
+        <button data-tpl="passdown">Project Brief</button>
+        <button data-tpl="bulletin">Launch Note</button>
         <button data-tpl="blank">Blank document</button>
       </div>
     </div>
@@ -20421,8 +20421,8 @@ function newBlock(type){const b={id:uid(),type};
  if(type==='ul')b.html='<li></li>';
  if(type==='image'){b.src='';b.cap='';b.w=0;b.h=0;}
  if(type==='stat'){b.num='0';b.lab='Label';b.txt='Describe the metric here.';}
- if(type==='rings'){b.title='';b.a={label:'This morning',value:74,max:548};b.two=true;b.bb={label:'Now',value:248,max:548};b.delta='cleared today';}
- if(type==='table'){b.headers=['Store','POG ID','Set'];b.rows=[['','','']];}
+ if(type==='rings'){b.title='';b.a={label:'Start',value:24,max:100};b.two=true;b.bb={label:'Now',value:68,max:100};b.delta='progress';}
+ if(type==='table'){b.headers=['Item','Reference','Notes'];b.rows=[['','','']];}
  return b;}
 
 function ringSVG(r,color){const C=326.726,pct=r.max>0?Math.max(0,Math.min(1,r.value/r.max)):0,dash=(pct*C).toFixed(1),p=Math.round(pct*100);
@@ -20537,7 +20537,7 @@ $('#fileLogo').addEventListener('change',e=>{const f=e.target.files[0];if(!f)ret
 $('#btnTemplates').addEventListener('click',e=>{e.stopPropagation();$('#tplMenu').classList.toggle('on');});
 document.addEventListener('click',()=>$('#tplMenu').classList.remove('on'));
 let userTemplates=[];
-function renderTplMenu(){let h='<button data-tpl="passdown">District Passdown</button><button data-tpl="bulletin">Field Bulletin</button><button data-tpl="blank">Blank document</button><div style="border-top:1px solid #e6e9ed"></div><button data-tpl="save">Save current as template…</button><button data-tpl="loadfile">Load template file…</button>';if(userTemplates.length){h+='<div style="border-top:1px solid #e6e9ed"></div>';userTemplates.forEach((t,i)=>h+=`<button data-utpl="${i}">\u2605 ${esc(t.name)}</button>`);}$('#tplMenu').innerHTML=h;}
+function renderTplMenu(){let h='<button data-tpl="passdown">Project Brief</button><button data-tpl="bulletin">Launch Note</button><button data-tpl="blank">Blank document</button><div style="border-top:1px solid #e6e9ed"></div><button data-tpl="save">Save current as template…</button><button data-tpl="loadfile">Load template file…</button>';if(userTemplates.length){h+='<div style="border-top:1px solid #e6e9ed"></div>';userTemplates.forEach((t,i)=>h+=`<button data-utpl="${i}">\u2605 ${esc(t.name)}</button>`);}$('#tplMenu').innerHTML=h;}
 function syncThemeSeg(){$('#themeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.th===doc.theme));}
 function applyTemplateDoc(model){if(doc.blocks.length&&!confirm('Replace the current document with this template?'))return;doc=JSON.parse(JSON.stringify(model));sel=null;syncThemeSeg();render();toast('Template applied');}
 function saveTemplate(){const name=prompt('Template name:',doc.title||'My template');if(!name)return;const snap=JSON.parse(JSON.stringify(doc));userTemplates.push({name,doc:snap});renderTplMenu();dl(new Blob([JSON.stringify({tactagTemplate:1,name,doc:snap},null,2)],{type:'application/json'}),name.replace(/\s+/g,'-')+'.template.json');toast('Template saved & downloaded');}
@@ -20546,18 +20546,18 @@ $('#fileTpl').addEventListener('change',e=>{const f=e.target.files[0];if(!f)retu
 function mk(type,extra){return Object.assign(newBlock(type),extra||{});}
 function loadTemplate(t){
  if(t==='blank'){doc=Object.assign(doc,{title:'Untitled document',subtitle:'',blocks:[]});sel=null;render();return;}
- if(t==='passdown'){setTheme('ro');doc.title='District __ Passdown — [date]';doc.subtitle='Tracking current through [time]';
-  doc.blocks=[ mk('rings',{a:{label:'This morning',value:74,max:548},two:true,bb:{label:'Now',value:248,max:548},delta:'cleared today'}),
-   mk('stat',{num:'174',lab:'Newly cleared today',txt:'Confirmed complete in both systems and marked on the tracker.'}),
-   mk('h2',{html:'Tasks taken'}), mk('ul',{html:'<li>Audited and reconciled the day\u2019s sets.</li><li>Completed sets directly in the system.</li><li>Submitted outstanding EODs.</li>'}),
-   mk('h2',{html:'Sets completed'}), mk('table',{headers:['Store','POG ID','Set'],rows:[['','',''],['','','']]}) ];
-  sel=null;render();toast('Passdown template loaded');return;}
- if(t==='bulletin'){setTheme('ro');doc.title='Field Bulletin — [topic]';doc.subtitle='Action required';
+ if(t==='passdown'){setTheme('ro');doc.title='Project Brief — [date]';doc.subtitle='Current through [time]';
+  doc.blocks=[ mk('rings',{a:{label:'Start',value:24,max:100},two:true,bb:{label:'Now',value:68,max:100},delta:'progress'}),
+   mk('stat',{num:'44',lab:'Items completed',txt:'Confirmed complete and reflected in the tracker.'}),
+   mk('h2',{html:'Highlights'}), mk('ul',{html:'<li>Reviewed current priorities.</li><li>Completed the highest-impact items.</li><li>Captured open follow-ups.</li>'}),
+   mk('h2',{html:'Completed items'}), mk('table',{headers:['Item','Owner','Notes'],rows:[['','',''],['','','']]}) ];
+  sel=null;render();toast('Project brief template loaded');return;}
+ if(t==='bulletin'){setTheme('ro');doc.title='Launch Note — [topic]';doc.subtitle='Action required';
   doc.blocks=[ mk('callout',{html:'<b>Summary:</b> what happened and who is affected.'}),
    mk('h2',{html:'What happened'}), mk('p',{html:'Describe the issue and its impact in a sentence or two.'}),
    mk('h2',{html:'What to do'}), mk('ul',{html:'<li>Step one.</li><li>Step two.</li>'}),
-   mk('divider',{}), mk('h2',{html:'Affected stores'}), mk('table',{headers:['Store','POG ID','Notes'],rows:[['','','']]}) ];
-  sel=null;render();toast('Bulletin template loaded');return;}
+   mk('divider',{}), mk('h2',{html:'Affected areas'}), mk('table',{headers:['Area','Reference','Notes'],rows:[['','','']]}) ];
+  sel=null;render();toast('Launch note template loaded');return;}
 }
 
 /* ---------- import ---------- */
