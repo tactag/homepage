@@ -56,6 +56,116 @@ function extractJson(text) {
   return JSON.parse(candidate.slice(start, end + 1));
 }
 
+function safeHref(href) {
+  const h = String(href || '').trim();
+  if (!h) return '';
+  if (/^(https?:|mailto:|#|\/|\.\.?\/)/i.test(h)) return h;
+  return '';
+}
+
+function escAttr(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;');
+}
+
+function escHtml(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function extractLinks(html) {
+  const links = [];
+  const re = /<a\b[^>]*\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))[^>]*>([\s\S]*?)<\/a>/gi;
+  let match;
+  while ((match = re.exec(String(html || '')))) {
+    const href = safeHref(match[1] || match[2] || match[3]);
+    const text = match[4].replace(/<[^>]+>/g, '').trim();
+    if (href) links.push({ href, text });
+  }
+  return links;
+}
+
+function collectLinks(document) {
+  const seen = new Set();
+  const links = [];
+  for (const block of document.blocks || []) {
+    const blockLinks = Array.isArray(block.links) ? block.links : extractLinks(block.html);
+    for (const link of blockLinks) {
+      const href = safeHref(link.href);
+      if (!href || seen.has(href)) continue;
+      seen.add(href);
+      links.push({ href, text: String(link.text || '').trim() });
+    }
+  }
+  return links;
+}
+
+function sanitizeAiHTML(html) {
+  const allowed = new Set(['a', 'b', 'strong', 'i', 'em', 'br', 'li', 'ul']);
+  const input = String(html || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '');
+
+  function walk(str) {
+    const out = [];
+    let i = 0;
+    while (i < str.length) {
+      const lt = str.indexOf('<', i);
+      if (lt === -1) {
+        out.push(escHtml(str.slice(i)));
+        break;
+      }
+      if (lt > i) out.push(escHtml(str.slice(i, lt)));
+
+      const gt = str.indexOf('>', lt);
+      if (gt === -1) {
+        out.push(escHtml(str.slice(lt)));
+        break;
+      }
+
+      const tagContent = str.slice(lt + 1, gt).trim();
+      const closing = tagContent.startsWith('/');
+      const tagName = (closing ? tagContent.slice(1) : tagContent).split(/\s/)[0].toLowerCase();
+
+      if (!allowed.has(tagName)) {
+        i = gt + 1;
+        continue;
+      }
+
+      if (tagName === 'br' && !closing) {
+        out.push('<br>');
+        i = gt + 1;
+        continue;
+      }
+
+      if (tagName === 'a' && !closing) {
+        const hrefMatch = tagContent.match(/^a\b[^>]*href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/i);
+        const href = safeHref(hrefMatch ? (hrefMatch[1] || hrefMatch[2] || hrefMatch[3]) : '');
+        const end = str.toLowerCase().indexOf('</a>', gt);
+        if (href && end !== -1) {
+          const inner = walk(str.slice(gt + 1, end));
+          out.push(`<a href="${escAttr(href)}" target="_blank" rel="noopener noreferrer">${inner}</a>`);
+          i = end + 4;
+          continue;
+        }
+        i = gt + 1;
+        continue;
+      }
+
+      if (closing) out.push(`</${tagName}>`);
+      else out.push(`<${tagName}>`);
+      i = gt + 1;
+    }
+    return out.join('');
+  }
+
+  return walk(input).trim();
+}
+
 function validateDocument(doc) {
   if (!doc || typeof doc !== 'object') throw new Error('Missing document.');
   if (!Array.isArray(doc.blocks)) throw new Error('Document blocks must be an array.');
@@ -65,7 +175,7 @@ function validateDocument(doc) {
     blocks: doc.blocks.slice(0, 80).map((block) => {
       const type = String(block.type || 'p');
       const out = { type };
-      if (['h1', 'h2', 'h3', 'p', 'callout', 'ul'].includes(type)) out.html = String(block.html || '');
+      if (['h1', 'h2', 'h3', 'p', 'callout', 'ul'].includes(type)) out.html = sanitizeAiHTML(block.html || '');
       if (type === 'stat') {
         out.num = String(block.num || '0');
         out.lab = String(block.lab || 'Key number');
@@ -88,6 +198,7 @@ function validateDocument(doc) {
 }
 
 function buildPrompt({ document, options = {} }) {
+  const linksToPreserve = collectLinks(document);
   return {
     role: 'user',
     content: JSON.stringify({
@@ -96,11 +207,16 @@ function buildPrompt({ document, options = {} }) {
         'Return only valid JSON. No markdown, no commentary.',
         'Output schema: { "title": string, "subtitle": string, "blocks": array }.',
         'Allowed block types: h1, h2, h3, p, ul, callout, stat, table, rings, divider.',
-        'For h1/h2/h3/p/callout/ul, use an html field. UL html must contain li elements.',
+        'For h1/h2/h3/p/callout/ul, use an html field with inline markup only.',
+        'UL html must contain <li> elements. Example: "<li>First</li><li>Second</li>".',
+        'The html field may contain inline tags: <a href="URL">, <b>, <i>, <br>.',
+        'Preserve every hyperlink as <a href="...">...</a>. Keep each original href URL exactly. You may rewrite link label text or surrounding prose, but never remove links or change href values.',
+        'When linksToPreserve is non-empty, every listed href must still appear in the output html as a working <a href="..."> tag.',
         'For table, use headers and rows arrays. For stat, use num, lab, txt.',
         'Do not invent private facts. Preserve the user intent, improve organization, and remove repetition.',
         'Make the result ready to publish, not just edited grammar.',
       ],
+      linksToPreserve,
       style: options.style || 'clear',
       format: options.format || 'keep',
       intensity: options.intensity || 'standard',
@@ -129,7 +245,7 @@ async function polish(body) {
       model: MODEL,
       max_tokens: 4096,
       temperature: 0.35,
-      system: 'You are an expert editor and information designer for PageSmith documents.',
+      system: 'You are an expert editor and information designer for PageSmith documents. Preserve hyperlinks in html fields using <a href="..."> tags. Never strip links or return plain-text URLs when the source used anchor tags.',
       messages: [buildPrompt(body)],
     }),
   });

@@ -63,6 +63,9 @@ button.tb.acc:hover{background:#ff5a2e;}
 .modal{background:#fff;border-radius:8px;max-width:580px;width:100%;padding:18px 20px;box-shadow:0 12px 50px rgba(0,0,0,.5);color:#22262c;max-height:90vh;overflow:auto;}
 .modal h3{margin:0 0 12px;color:#161616;font-size:16px;border-bottom:2px solid var(--orange);padding-bottom:6px;}
 .modal textarea{width:100%;height:200px;font:inherit;font-size:13px;border:1px solid #d7dade;border-radius:6px;padding:10px;resize:vertical;}
+.paste-area{width:100%;min-height:200px;max-height:360px;overflow:auto;font:inherit;font-size:13px;border:1px solid #d7dade;border-radius:6px;padding:10px;line-height:1.5;background:#fff;color:#22262c;}
+.paste-area:empty::before{content:attr(data-placeholder);color:#9aa0a8;pointer-events:none;}
+.paste-area a{color:var(--orange);text-decoration:underline;}
 .modal .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
 .modal .tb{background:#26282d;}
 .brandgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;}
@@ -178,14 +181,14 @@ button.tb.acc:hover{background:#ff5a2e;}
 
 <div class="scrim" id="pasteScrim"><div class="modal">
   <h3>Paste text</h3>
-  <p class="hint" style="margin:0 0 8px">Formatting is stripped. Blank lines split paragraphs; lines starting with "- " become a bullet list.</p>
-  <textarea id="pasteArea" placeholder="Paste your text here…"></textarea>
+  <p class="hint" style="margin:0 0 8px">Paste from Word, email, or the web — hyperlinks and basic bold/italic are kept. Blank lines split paragraphs; lines starting with "- " become a bullet list.</p>
+  <div id="pasteArea" class="paste-area" contenteditable="true" data-placeholder="Paste your text here…"></div>
   <div class="acts"><button class="tb" id="pasteCancel">Cancel</button><button class="tb pri" id="pasteAdd">Add to document</button></div>
 </div></div>
 
 <div class="scrim" id="aiScrim"><div class="modal" style="max-width:680px">
   <h3>AI Polish</h3>
-  <p class="hint" style="margin:0 0 12px">Send the current text structure to your PageSmith AI API. Your Claude key stays on Railway; this page only stores the service URL.</p>
+  <p class="hint" style="margin:0 0 12px">Send the current text structure to your PageSmith AI API. Hyperlinks are preserved during polish. Your Claude key stays on Railway; this page only stores the service URL.</p>
   <div class="ai-grid">
     <label class="full">AI service URL <input type="url" id="aiUrl" placeholder="https://your-service.up.railway.app"></label>
     <label>Style
@@ -284,8 +287,9 @@ button.tb.acc:hover{background:#ff5a2e;}
     <ol style="margin:0 0 12px;padding-left:18px;">
       <li>Start with a <b>Template</b>, paste existing text, or build from blocks.</li>
       <li>Click any block to select it. New blocks are inserted after the selected block; the block controls change type, move, or delete it.</li>
-      <li>Use <b>AI Polish</b> to reorganize and rewrite text with style and format options. The Claude API key lives on Railway, not in the page.</li>
+      <li>Use <b>AI Polish</b> to reorganize and rewrite text with style and format options. Hyperlinks are preserved. The Claude API key lives on Railway, not in the page.</li>
       <li>Use a <b>Canvas</b> block for freeform layout: drag, resize, rotate, draw, highlight, add shapes, arrows, images, and WordArt-style text.</li>
+      <li><b>Paste text</b> keeps hyperlinks and basic bold/italic from Word, email, or the web.</li>
       <li>Type directly into the page. Use <b>B</b>/<b>I</b>/<b>Link</b> to format selected text.</li>
       <li><b>Export</b> as HTML, PDF, DOCX, TXT, or Copy for email.</li>
     </ol>
