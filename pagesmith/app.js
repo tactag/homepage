@@ -316,9 +316,109 @@ function loadTemplate(t){
  sel=null;syncThemeSeg();render();toast(tpl.toast);
 }
 
-/* ---------- ai polish ---------- */
+/* ---------- auth gate (email OTP — no magic links for scrapers) ---------- */
 const AI_URL_KEY='pagesmith.aiServiceUrl';
 const AI_DEFAULT_URL='https://pagesmith-api-production.up.railway.app';
+const AUTH_TOKEN_KEY='pagesmith.authToken';
+const AUTH_EMAIL_KEY='pagesmith.authEmail';
+let authToken=localStorage.getItem(AUTH_TOKEN_KEY)||'';
+let authEmail=localStorage.getItem(AUTH_EMAIL_KEY)||'';
+let authPendingEmail='';
+function apiBase(){return (localStorage.getItem(AI_URL_KEY)||AI_DEFAULT_URL).replace(/\/+$/,'');}
+function authHeaders(extra={}){const h={'content-type':'application/json',...extra};if(authToken)h.authorization='Bearer '+authToken;return h;}
+function setAuthMsg(text,kind){const el=$('#authMsg');if(!el)return;el.textContent=text||'';el.className='auth-msg'+(kind?' '+kind:'');}
+function showAuthGate(){
+ const gate=$('#authGate'),root=$('#appRoot');
+ if(gate)gate.classList.remove('hidden');
+ if(root)root.classList.remove('on');
+ document.body.style.overflow='hidden';
+}
+function showApp(email){
+ authEmail=email||authEmail;
+ localStorage.setItem(AUTH_EMAIL_KEY,authEmail);
+ const gate=$('#authGate'),root=$('#appRoot'),user=$('#authUser');
+ if(gate)gate.classList.add('hidden');
+ if(root)root.classList.add('on');
+ if(user){user.textContent=authEmail;user.title=authEmail;}
+ document.body.style.overflow='';
+}
+async function validateSession(){
+ if(!authToken)return false;
+ try{
+  const res=await fetch(apiBase()+'/api/auth/me',{headers:authHeaders()});
+  if(!res.ok)return false;
+  const data=await res.json().catch(()=>({}));
+  if(data.email){authEmail=data.email;return true;}
+  return false;
+ }catch{return false;}
+}
+async function requestCode(){
+ const email=($('#authEmail')?.value||'').trim().toLowerCase();
+ if(!email||!email.includes('@')){setAuthMsg('Enter a valid email.','err');return;}
+ const btn=$('#authSend');if(btn)btn.disabled=true;
+ setAuthMsg('Sending code…');
+ try{
+  const res=await fetch(apiBase()+'/api/auth/request-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.error||'Could not send code');
+  authPendingEmail=email;
+  $('#authStepEmail').hidden=true;
+  $('#authStepCode').hidden=false;
+  $('#authCode').value='';
+  setTimeout(()=>$('#authCode')?.focus(),0);
+  setAuthMsg(data.message||'Code sent if authorized. Enter it below.','ok');
+ }catch(err){setAuthMsg(err.message||'Request failed','err');}
+ finally{if(btn)btn.disabled=false;}
+}
+async function verifyCode(){
+ const email=authPendingEmail||($('#authEmail')?.value||'').trim().toLowerCase();
+ const code=($('#authCode')?.value||'').replace(/\s+/g,'');
+ if(!/^\d{6}$/.test(code)){setAuthMsg('Enter the 6-digit code from your email.','err');return;}
+ const btn=$('#authVerify');if(btn)btn.disabled=true;
+ setAuthMsg('Checking code…');
+ try{
+  const res=await fetch(apiBase()+'/api/auth/verify-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email,code})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok)throw new Error(data.error||'Invalid code');
+  authToken=data.token;authEmail=data.email||email;
+  localStorage.setItem(AUTH_TOKEN_KEY,authToken);
+  localStorage.setItem(AUTH_EMAIL_KEY,authEmail);
+  setAuthMsg('');
+  showApp(authEmail);
+  toast('Signed in as '+authEmail);
+ }catch(err){setAuthMsg(err.message||'Sign-in failed','err');}
+ finally{if(btn)btn.disabled=false;}
+}
+async function signOut(){
+ try{if(authToken)await fetch(apiBase()+'/api/auth/logout',{method:'POST',headers:authHeaders()});}catch{}
+ authToken='';authEmail='';authPendingEmail='';
+ localStorage.removeItem(AUTH_TOKEN_KEY);localStorage.removeItem(AUTH_EMAIL_KEY);
+ $('#authStepEmail').hidden=false;$('#authStepCode').hidden=true;
+ if($('#authCode'))$('#authCode').value='';
+ setAuthMsg('');
+ showAuthGate();
+ toast('Signed out');
+}
+function wireAuthUi(){
+ $('#authSend')?.addEventListener('click',requestCode);
+ $('#authVerify')?.addEventListener('click',verifyCode);
+ $('#authBack')?.addEventListener('click',()=>{$('#authStepCode').hidden=true;$('#authStepEmail').hidden=false;setAuthMsg('');});
+ $('#btnSignOut')?.addEventListener('click',signOut);
+ $('#authEmail')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();requestCode();}});
+ $('#authCode')?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();verifyCode();}});
+ $('#authCode')?.addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,6);});
+ if(authEmail&&$('#authEmail'))$('#authEmail').value=authEmail;
+}
+async function bootAuth(){
+ wireAuthUi();
+ showAuthGate();
+ const ok=await validateSession();
+ if(ok)showApp(authEmail);
+ else{authToken='';localStorage.removeItem(AUTH_TOKEN_KEY);showAuthGate();setTimeout(()=>$('#authEmail')?.focus(),50);}
+}
+bootAuth();
+
+/* ---------- ai polish ---------- */
 let aiPreviewDoc=null;
 let aiSourceLinks=[];
 function aiTextFromHTML(html){const d=document.createElement('div');d.innerHTML=html||'';return d.textContent.trim();}
@@ -340,10 +440,10 @@ function aiBlockFromModel(block){const allowed=['h1','h2','h3','p','ul','callout
  return b;}
 function aiNormalizeDoc(model){return {title:String(model.title||doc.title||'Untitled document'),subtitle:String(model.subtitle||''),blocks:(model.blocks||[]).map(aiBlockFromModel)};}
 function aiPreviewText(model){const lines=[model.title||'Untitled document'];if(model.subtitle)lines.push(model.subtitle);lines.push('',`${(model.blocks||[]).length} blocks ready to apply.`);if(aiSourceLinks.length){const out=(model.blocks||[]).flatMap(b=>aiExtractLinks(b.html||''));const kept=out.filter(l=>aiSourceLinks.some(s=>s.href===l.href)).length;lines.push(`${kept}/${aiSourceLinks.length} hyperlinks preserved.`);}(model.blocks||[]).slice(0,6).forEach(b=>{if(['h1','h2','h3','p','callout','ul'].includes(b.type))lines.push(`- ${aiTextFromHTML(b.html).slice(0,120)}`);else lines.push(`- ${b.type}`);});return lines.join('\n');}
-function aiEndpoint(){return ($('#aiUrl').value||'').trim().replace(/\/+$/,'');}
-function openAI(){aiPreviewDoc=null;aiSourceLinks=doc.blocks.flatMap(b=>aiExtractLinks(b.html||''));$('#aiUrl').value=localStorage.getItem(AI_URL_KEY)||AI_DEFAULT_URL;$('#aiPreview').textContent='Run AI Polish to preview the rewritten document here.';$('#aiApply').disabled=true;$('#aiScrim').classList.add('on');}
-async function runAI(){const url=aiEndpoint();if(!url){toast('Add your Railway AI service URL first');return;}aiSourceLinks=doc.blocks.flatMap(b=>aiExtractLinks(b.html||''));localStorage.setItem(AI_URL_KEY,url);$('#aiRun').disabled=true;$('#aiRun').textContent='Polishing...';$('#aiPreview').textContent='Claude is organizing the document...';
- try{const res=await fetch(url+'/api/polish',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({document:aiCompactDoc(),options:{style:$('#aiStyle').value,format:$('#aiFormat').value,intensity:$('#aiIntensity').value,instructions:$('#aiInstructions').value}})});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||'AI request failed');aiPreviewDoc=aiNormalizeDoc(data.document);$('#aiPreview').textContent=aiPreviewText(aiPreviewDoc);$('#aiApply').disabled=false;toast('AI preview ready');}
+function aiEndpoint(){return ($('#aiUrl').value||apiBase()||'').trim().replace(/\/+$/,'');}
+function openAI(){if(!authToken){toast('Sign in required');return;}aiPreviewDoc=null;aiSourceLinks=doc.blocks.flatMap(b=>aiExtractLinks(b.html||''));$('#aiUrl').value=localStorage.getItem(AI_URL_KEY)||AI_DEFAULT_URL;$('#aiPreview').textContent='Run AI Polish to preview the rewritten document here.';$('#aiApply').disabled=true;$('#aiScrim').classList.add('on');}
+async function runAI(){const url=aiEndpoint();if(!url){toast('Add your Railway AI service URL first');return;}if(!authToken){toast('Sign in required');return;}aiSourceLinks=doc.blocks.flatMap(b=>aiExtractLinks(b.html||''));localStorage.setItem(AI_URL_KEY,url);$('#aiRun').disabled=true;$('#aiRun').textContent='Polishing...';$('#aiPreview').textContent='Claude is organizing the document...';
+ try{const res=await fetch(url+'/api/polish',{method:'POST',headers:authHeaders(),body:JSON.stringify({document:aiCompactDoc(),options:{style:$('#aiStyle').value,format:$('#aiFormat').value,intensity:$('#aiIntensity').value,instructions:$('#aiInstructions').value}})});const data=await res.json().catch(()=>({}));if(res.status===401){await signOut();throw new Error('Session expired — sign in again');}if(!res.ok)throw new Error(data.error||'AI request failed');aiPreviewDoc=aiNormalizeDoc(data.document);$('#aiPreview').textContent=aiPreviewText(aiPreviewDoc);$('#aiApply').disabled=false;toast('AI preview ready');}
  catch(err){$('#aiPreview').textContent='Error: '+err.message;toast('AI Polish failed');}
  finally{$('#aiRun').disabled=false;$('#aiRun').textContent='AI Polish';}}
 function applyAI(){if(!aiPreviewDoc)return;const preserved=doc.blocks.filter(b=>['image','art'].includes(b.type));doc.title=aiPreviewDoc.title;doc.subtitle=aiPreviewDoc.subtitle;doc.blocks=[...aiPreviewDoc.blocks,...preserved];sel=null;render();$('#aiScrim').classList.remove('on');toast('AI polish applied');}

@@ -1,24 +1,45 @@
 # PageSmith AI API
 
-Small Railway-ready backend for PageSmith's AI Polish feature. It keeps the Claude API key off the static site and exposes:
+Railway-ready backend for PageSmith: email OTP auth + AI Polish. The Claude key stays off the static site.
 
-- `GET /health`
-- `POST /api/polish`
+## Endpoints
+
+| Method | Path | Auth | Purpose |
+|--------|------|------|---------|
+| `GET` | `/health` | no | Health check |
+| `POST` | `/api/auth/request-code` | no | Send 6-digit OTP to allowlisted email |
+| `POST` | `/api/auth/verify-code` | no | Exchange email + code for session token |
+| `GET` | `/api/auth/me` | Bearer | Current session |
+| `POST` | `/api/auth/logout` | Bearer | Revoke session |
+| `POST` | `/api/polish` | Bearer | AI document polish |
+
+## Scraper-safe OTP
+
+Email hosts and security bots often **GET** every link in a message, which burns one-time magic links before the user clicks. PageSmith auth avoids that:
+
+- Emails contain a **6-digit code**, not a login token in a URL
+- The optional “Open PageSmith” link is only `https://tactag.app/pagesmith/` with **no secrets**
+- The user must type the code on the sign-in screen (bots that only follow links cannot complete login)
 
 ## Railway Variables
 
-Set these on the Railway service:
+| Variable | Required | Notes |
+|----------|----------|--------|
+| `ANTHROPIC_API_KEY` | for AI | Claude key |
+| `ANTHROPIC_MODEL` | no | default `claude-sonnet-4-6` |
+| `ALLOWED_ORIGINS` | yes | `https://tactag.app,http://localhost:3000` |
+| `RESEND_API_KEY` | for auth | Resend API key |
+| `RESEND_FROM` | no | verified sender, e.g. `PageSmith <noreply@construe.tactag.app>` |
+| `SESSION_SECRET` | yes | long random string; sessions break if rotated |
+| `AUTH_ALLOWLIST` | no | comma emails; defaults to Tyson + D6 supervisor |
+| `APP_URL` | no | plain link in OTP email |
 
-- `ANTHROPIC_API_KEY`: your Claude/Anthropic API key.
-- `ANTHROPIC_MODEL`: optional, defaults to `claude-sonnet-4-6`.
-- `ALLOWED_ORIGINS`: recommended `https://tactag.app,http://localhost:3000`.
+## Deploy
 
-## Deploy Notes
-
-Deploy this folder as the Railway service root directory:
+Deploy this folder as the Railway service root:
 
 ```sh
 pagesmith-api
 ```
 
-After Railway gives you a public service URL, open PageSmith, click `AI Polish`, paste the service URL, and save it. PageSmith stores only the service URL in browser local storage, never the API key.
+Service URL used by the static app: `https://pagesmith-api-production.up.railway.app`

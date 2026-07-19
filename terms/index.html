@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms of Service — TACTAG</title>
+<meta name="description" content="TACTAG terms of service, including SMS program terms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #141416;
+    --line: #242426;
+    --text: #e8e8e6;
+    --muted: #9a9aa2;
+    --accent: #ff3c00;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover, a:focus-visible { text-decoration: underline; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 1.5rem; }
+
+  header.site {
+    border-bottom: 1px solid var(--line);
+    padding: 1.25rem 0;
+  }
+  header.site .wrap {
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  .brand {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.06em;
+    color: var(--text);
+  }
+  .brand span { color: var(--accent); }
+  .site-nav { font-family: "IBM Plex Mono", monospace; font-size: 0.8rem; }
+  .site-nav a { color: var(--muted); margin-left: 1.25rem; }
+  .site-nav a:hover { color: var(--text); }
+
+  .doc-head { padding: 4rem 0 2.5rem; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+  h1 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(2.6rem, 7vw, 4rem);
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    font-weight: 400;
+  }
+  .meta {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 0.9rem;
+  }
+
+  main { padding-bottom: 4rem; }
+  section { padding: 1.9rem 0; border-top: 1px solid var(--line); }
+  h2 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 1.55rem;
+    letter-spacing: 0.04em;
+    font-weight: 400;
+    margin-bottom: 0.8rem;
+  }
+  p + p { margin-top: 0.9rem; }
+  ul { margin: 0.9rem 0 0 1.2rem; }
+  li + li { margin-top: 0.45rem; }
+  strong { color: var(--text); font-weight: 700; }
+
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    padding: 1.1rem 1.25rem;
+    margin-top: 1rem;
+    border-radius: 4px;
+  }
+  code {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9em;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+  }
+
+  footer.site {
+    border-top: 1px solid var(--line);
+    padding: 1.5rem 0 2.5rem;
+  }
+  footer.site .wrap {
+    display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem;
+    align-items: baseline; justify-content: space-between;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem; color: var(--muted);
+  }
+  footer.site a { color: var(--muted); }
+  footer.site a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="/">TAC<span>TAG</span></a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="/terms/" aria-current="page">Terms</a>
+      <a href="/privacy/">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+<div class="doc-head">
+  <div class="wrap">
+    <span class="eyebrow">Legal</span>
+    <h1>Terms of Service</h1>
+    <p class="meta">Effective July 19, 2026 · TACTAG · Tact Automation Gateway</p>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section>
+    <h2>Agreement</h2>
+    <p>These Terms of Service ("Terms") govern your use of tactag.app and related tools and services provided by TACTAG ("TACTAG," "we," "us"), including the TACTAG SMS program. By using our services or opting in to text messages, you agree to these Terms and to our <a href="/privacy/">Privacy Policy</a>.</p>
+  </section>
+
+  <section>
+    <h2>SMS program terms</h2>
+    <p>The TACTAG SMS program delivers one-time login codes (OTP) and occasional field coordination alerts, such as schedule and assignment updates.</p>
+    <ul>
+      <li><strong>Opt-in.</strong> You opt in by texting <code>JOIN</code> to <strong>(509) 572-9212</strong>. By opting in, you confirm you are the subscriber or customary user of the mobile number provided and consent to receive text messages from TACTAG at that number.</li>
+      <li><strong>Message frequency varies.</strong> Login codes are sent per sign-in attempt; coordination alerts are occasional.</li>
+      <li><strong>Message and data rates may apply.</strong> Charges are determined by your mobile carrier and plan.</li>
+      <li><strong>Opt-out.</strong> Reply <code>STOP</code> at any time to cancel. You will receive one final confirmation message, after which no further messages will be sent unless you opt in again.</li>
+      <li><strong>Help.</strong> Reply <code>HELP</code> for assistance, or contact <a href="mailto:hello@tactag.app">hello@tactag.app</a>.</li>
+      <li><strong>Carriers.</strong> Supported carriers may vary. Carriers are not liable for delayed or undelivered messages.</li>
+      <li><strong>Eligibility.</strong> The SMS program is intended for users 18 years of age or older.</li>
+    </ul>
+    <div class="callout">
+      <p>Consent to receive text messages is not a condition of purchasing any goods or services. See our <a href="/privacy/">Privacy Policy</a> for how we handle your mobile information, including our commitment that no mobile information will be shared with third parties or affiliates for marketing or promotional purposes.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Acceptable use</h2>
+    <p>You agree not to misuse our services — including attempting to access accounts that are not yours, disrupting or probing our systems, or using the services in violation of applicable law.</p>
+  </section>
+
+  <section>
+    <h2>Accounts and security</h2>
+    <p>You are responsible for maintaining the security of your account credentials and the mobile number associated with your account. Notify us promptly at <a href="mailto:hello@tactag.app">hello@tactag.app</a> if you believe your account or number has been compromised, or if you change your mobile number.</p>
+  </section>
+
+  <section>
+    <h2>Intellectual property</h2>
+    <p>TACTAG and its tools, content, and branding are the property of TACTAG. These Terms do not grant you any rights to our trademarks or other intellectual property except as needed to use the services as intended.</p>
+  </section>
+
+  <section>
+    <h2>Disclaimers</h2>
+    <p>Our services are provided "as is" and "as available," without warranties of any kind, express or implied, including warranties of merchantability, fitness for a particular purpose, and non-infringement. We do not guarantee that messages will be delivered without delay or error.</p>
+  </section>
+
+  <section>
+    <h2>Limitation of liability</h2>
+    <p>To the fullest extent permitted by law, TACTAG will not be liable for any indirect, incidental, special, consequential, or punitive damages, or for any loss of data, profits, or business, arising out of or related to your use of the services.</p>
+  </section>
+
+  <section>
+    <h2>Changes and termination</h2>
+    <p>We may modify these Terms or discontinue the services at any time. Material changes will be posted on this page with an updated effective date. Continued use of the services after changes take effect constitutes acceptance of the revised Terms.</p>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>Questions about these Terms or the SMS program: <a href="mailto:hello@tactag.app">hello@tactag.app</a></p>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <span>© 2026 TACTAG · Tact Automation Gateway</span>
+    <span><a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a> · <a href="mailto:hello@tactag.app">hello@tactag.app</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

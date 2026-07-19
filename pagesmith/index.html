@@ -94,11 +94,57 @@ button.tb.acc:hover{background:#ff5a2e;}
 .ai-grid input,.ai-grid select,.ai-grid textarea{font:inherit;font-size:12px;border:1px solid #d7dade;border-radius:5px;padding:7px 8px;}
 .ai-grid textarea{min-height:78px;resize:vertical;}
 .ai-preview{background:#f7f8fa;border:1px solid #dce1e7;border-radius:6px;padding:10px 12px;min-height:76px;white-space:pre-wrap;color:#303640;font-size:12.5px;}
+/* auth gate */
+#authGate{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 30% 20%,#2a1812 0%,#141414 55%,#0c0c0e 100%);}
+#authGate.hidden{display:none;}
+#appRoot{display:none;flex-direction:column;height:100%;}
+#appRoot.on{display:flex;}
+.auth-card{width:100%;max-width:400px;background:#1d1f24;border:1px solid #34373d;border-radius:10px;padding:28px 26px 24px;box-shadow:0 18px 50px rgba(0,0,0,.45);}
+.auth-card h1{margin:0 0 6px;font-size:22px;font-weight:700;color:#fff;letter-spacing:.02em;}
+.auth-card .sub{margin:0 0 20px;font-size:13px;line-height:1.5;color:#9a9ea6;}
+.auth-card label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:#9a9ea6;margin:0 0 6px;}
+.auth-card input{width:100%;font:inherit;font-size:15px;border:1px solid #34373d;border-radius:6px;padding:10px 12px;background:#141414;color:#e9eaec;margin-bottom:14px;}
+.auth-card input:focus{outline:none;border-color:var(--orange);}
+.auth-card input[type=text]#authCode{letter-spacing:.35em;font-size:20px;font-weight:600;text-align:center;}
+.auth-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.auth-actions button{flex:1;min-width:120px;font:inherit;font-size:13px;border:1px solid #34373d;background:#26282d;color:#e9eaec;padding:10px 12px;border-radius:6px;cursor:pointer;}
+.auth-actions button.pri{background:var(--orange);border-color:var(--orange);color:#fff;font-weight:600;}
+.auth-actions button:disabled{opacity:.55;cursor:not-allowed;}
+.auth-msg{min-height:18px;margin:10px 0 0;font-size:12.5px;line-height:1.4;color:#9a9ea6;}
+.auth-msg.err{color:#ff8a70;}
+.auth-msg.ok{color:#8fd49a;}
+.auth-foot{margin-top:16px;font-size:11px;color:#6b7178;line-height:1.45;}
+#authUser{font-size:11px;color:#9a9ea6;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 </style>
 <style id="doccss"></style>
 </head>
 <body>
 
+<div id="authGate" aria-live="polite">
+  <div class="auth-card">
+    <h1>PageSmith</h1>
+    <p class="sub">Authorized email sign-in. We’ll send a one-time code — enter it here. No magic link (email scanners can’t burn your login).</p>
+    <div id="authStepEmail">
+      <label for="authEmail">Email</label>
+      <input id="authEmail" type="email" autocomplete="username email" placeholder="you@example.com" spellcheck="false">
+      <div class="auth-actions">
+        <button type="button" class="pri" id="authSend">Send code</button>
+      </div>
+    </div>
+    <div id="authStepCode" hidden>
+      <label for="authCode">6-digit code</label>
+      <input id="authCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" spellcheck="false">
+      <div class="auth-actions">
+        <button type="button" id="authBack">Back</button>
+        <button type="button" class="pri" id="authVerify">Sign in</button>
+      </div>
+    </div>
+    <p class="auth-msg" id="authMsg"></p>
+    <p class="auth-foot">TACTAG · access limited to approved accounts.</p>
+  </div>
+</div>
+
+<div id="appRoot">
 <div class="bar">
   <div class="row">
     <img class="logo" id="brandLogo" alt="PageSmith">
@@ -143,7 +189,11 @@ button.tb.acc:hover{background:#ff5a2e;}
       <button class="tb" id="btnTxt">TXT</button>
       <button class="tb acc" id="btnEmail">Copy for email</button>
     </div>
-    <div class="grp"><button class="tb" id="btnHelp" title="Help" style="font-weight:700;">?</button></div>
+    <div class="grp">
+      <span id="authUser" title=""></span>
+      <button class="tb" id="btnSignOut" title="Sign out">Sign out</button>
+      <button class="tb" id="btnHelp" title="Help" style="font-weight:700;">?</button>
+    </div>
   </div>
   <div class="row sub">
     <div class="grp"><span class="lbl">Add</span>
@@ -314,6 +364,7 @@ button.tb.acc:hover{background:#ff5a2e;}
 </div></div>
 
 <div class="toast" id="toast"></div>
+</div><!-- /#appRoot -->
 
 <script src="vendor/docx.bundle.js"></script>
 <script src="assets/logos.js"></script>
