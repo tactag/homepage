@@ -86,6 +86,60 @@
     line-height: 1.8;
   }
 
+  .join-cta-text {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: clamp(1rem, 4vw, 1.15rem);
+    font-weight: 500;
+    color: var(--text);
+    margin: 1.25rem 0 1rem;
+    letter-spacing: 0.02em;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .join-sms-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 420px;
+    min-height: 56px;
+    padding: 1rem 1.5rem;
+    margin: 0 auto;
+    background: var(--accent);
+    color: #fff;
+    font-family: "DM Sans", system-ui, sans-serif;
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .join-sms-btn:hover,
+  .join-sms-btn:focus-visible {
+    background: #e63600;
+    text-decoration: none;
+    color: #fff;
+  }
+  .join-sms-btn:active { transform: scale(0.98); }
+  .join-sms-btn:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 3px;
+  }
+
+  .join-compliance {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 1rem;
+    line-height: 1.7;
+  }
+
   section { padding: 1.9rem 0; border-top: 1px solid var(--line); }
   h2 {
     font-family: "Bebas Neue", sans-serif;
@@ -142,6 +196,13 @@
   <div class="join-card">
     <div class="kw">TEXT&nbsp;JOIN</div>
     <div class="to">to (509) 572-9212</div>
+    <p class="join-cta-text">Text JOIN to (509) 572-9212</p>
+    <a class="join-sms-btn" href="sms:+15095729212?&amp;body=JOIN">Open Messages &amp; Text JOIN</a>
+    <p class="join-compliance">
+      Messages are sent by <strong>Tyson Gauthier doing business as TACTAG</strong>.
+      Message frequency varies. Message and data rates may apply.
+      Reply STOP to opt out. Reply HELP for help.
+    </p>
     <p class="fine">
       By texting JOIN, you agree to receive recurring text messages from TACTAG, including login codes and field coordination alerts, at the number you text from. Consent is not a condition of any purchase. Message frequency varies. Message &amp; data rates may apply. Reply HELP for help or STOP to cancel.
       <br><a href="/terms/">Terms of Service</a> · <a href="/privacy/">Privacy Policy</a>
@@ -178,7 +239,7 @@
   <section>
     <h2>Your privacy</h2>
     <p>No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. Text messaging originator opt-in data and consent will not be sold, rented, or shared with any third parties. See the full <a href="/privacy/">Privacy Policy</a> and <a href="/terms/">Terms of Service</a>.</p>
-    <p>TACTAG is the operating name of Tyson Gauthier, sole proprietor, the registered sender of this SMS program. Contact: <a href="mailto:hello@tactag.app">hello@tactag.app</a>.</p>
+    <p>TACTAG is the operating name of <strong>Tyson Gauthier doing business as TACTAG</strong>, sole proprietor, the registered sender of this SMS program. Contact: <a href="mailto:hello@tactag.app">hello@tactag.app</a>.</p>
   </section>
 
 </main>
